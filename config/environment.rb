@@ -10,6 +10,10 @@ SPREE_GEM_VERSION = '0.10.2' unless defined? SPREE_GEM_VERSION
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
 
+# using Braintree fork until patch #173 is accepted and released with ActiveMerchant
+# https://jadedpixel.lighthouseapp.com/projects/11599/tickets/173
+require "#{RAILS_ROOT}/vendor/active_merchant_braintree_fork/lib/active_merchant"
+
 Spree::Initializer.run do |config|
   # Settings in config/environments/* take precedence over those specified here.
   # Application configuration should go into files in config/initializers
@@ -29,7 +33,8 @@ Spree::Initializer.run do |config|
   config.gem "highline", :version => '1.5.1'
   config.gem 'authlogic', :version => '>=2.1.2'
   config.gem 'authlogic-oid', :lib => "authlogic_openid", :version => '1.0.4'
-  config.gem "activemerchant", :lib => "active_merchant", :version => '1.5.1'
+  # commented out to load Braintree's fork of ActiveMerchant from vendor instead of using gem
+  # config.gem "activemerchant", :lib => "active_merchant", :version => '1.5.1'
   config.gem 'activerecord-tableless', :lib => 'tableless', :version => '0.1.0'
   config.gem 'less', :version => '1.2.20'
   config.gem 'stringex', :lib => 'stringex', :version => '1.0.3'
