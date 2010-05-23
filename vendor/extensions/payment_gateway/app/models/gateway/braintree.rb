@@ -29,8 +29,16 @@ class Gateway::Braintree < Gateway
     end
   end
 
+  def credit(*args)
+    raise NotImplementedError
+  end
+
   def payment_profiles_supported?
     true
+  end
+
+  def purchase(money, creditcard, options = {})
+    authorize(money, creditcard, options.merge(:submit_for_settlement => true))
   end
 
   def void(response_code, ignored_creditcard, ignored_options)
