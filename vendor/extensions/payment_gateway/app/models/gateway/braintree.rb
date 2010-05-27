@@ -19,6 +19,7 @@ class Gateway::Braintree < Gateway
   end
 
   def create_profile(creditcard, options)
+    adjust_country_name(options)
     if creditcard.gateway_customer_profile_id.nil?
       response = provider.store(creditcard, options)
       if response.success?

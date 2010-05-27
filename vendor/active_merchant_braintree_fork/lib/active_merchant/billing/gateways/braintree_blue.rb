@@ -71,7 +71,8 @@ module ActiveMerchant #:nodoc:
               :number => creditcard.number,
               :cvv => creditcard.verification_value,
               :expiration_month => creditcard.month.to_s.rjust(2, "0"),
-              :expiration_year => creditcard.year.to_s
+              :expiration_year => creditcard.year.to_s,
+              :billing_address => options[:billing_address] ? map_address(options[:billing_address]) : nil
             }
           )
           Response.new(result.success?, message_from_result(result),

@@ -96,7 +96,7 @@ class Payment < ActiveRecord::Base
     end
 
     def create_payment_profile
-      source.create_payment_profile
+      source.create_payment_profile(order)
     end
   
 end
