@@ -30,7 +30,26 @@ class Gateway::Braintree < Gateway
   end
 
   def credit(*args)
-    raise NotImplementedError
+    if args.size == 4
+      credit_with_payment_profiles(*args)
+    elsif args.size == 3
+      credit_without_payment_profiles(*args)
+    else
+      raise ArgumentError, "Expected 3 or 4 arguments, received #{args.size}"
+    end
+  end
+
+  def credit_with_payment_profiles(amount, payment, response_code, option)
+    provider.credit(amount, payment)
+  end
+
+  def credit_without_payment_profiles(amount, response_code, options)
+    transaction = ::Braintree::Transaction.find(response_code)
+    if BigDecimal.new(amount.to_s) == (transaction.amount * 100)
+      provider.refund(response_code)
+    else
+      raise NotImplementedError
+    end
   end
 
   def payment_profiles_supported?
