@@ -68,6 +68,33 @@ class BraintreeTest < Test::Unit::TestCase
   end
 
   context "capture" do
+    should "capture a previous authorization" do
+      @payment.process!
+      assert_equal 1, @payment.txns.size
+      assert_match /\A\w{6}\z/, @payment.txns[0].response_code
+      transaction = ::Braintree::Transaction.find(@payment.txns[0].response_code)
+      assert_equal Braintree::Transaction::Status::Authorized, transaction.status
+      capture_result = @gateway.capture(@payment.txns.first, :ignored_arg_creditcard, :ignored_arg_options)
+      assert_equal true, capture_result.success?
+      transaction = ::Braintree::Transaction.find(@payment.txns[0].response_code)
+      assert_equal Braintree::Transaction::Status::SubmittedForSettlement, transaction.status
+    end
+
+    should "raise an error if capture fails using spree interface" do
+      Spree::Config.set :auto_capture => false
+      assert_equal 0, @payment.txns.size
+      @payment.process!
+      assert_equal 1, @payment.txns.size
+      transaction = ::Braintree::Transaction.find(@payment.txns[0].response_code)
+      assert_equal Braintree::Transaction::Status::Authorized, transaction.status
+      @payment.source.capture(@payment) # as done in PaymentsController#fire
+      transaction = ::Braintree::Transaction.find(@payment.txns[0].response_code)
+      assert_equal Braintree::Transaction::Status::SubmittedForSettlement, transaction.status
+      assert_raises(Spree::GatewayError, "Cannot submit for settlement unless status is authorized. (91507)") do
+        @payment.source.capture(@payment) # as done in PaymentsController#fire
+      end
+    end
+
     should "work using the spree interface" do
       Spree::Config.set :auto_capture => false
       assert_equal 0, @payment.txns.size
