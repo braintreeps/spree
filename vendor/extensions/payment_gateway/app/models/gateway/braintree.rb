@@ -24,7 +24,7 @@ class Gateway::Braintree < Gateway
       if response.success?
         payment.source.update_attributes!(:gateway_customer_profile_id => response.params["customer_vault_id"])
       else
-        payment.gateway_error response.message
+        payment.source.gateway_error response.message
       end
     end
   end
