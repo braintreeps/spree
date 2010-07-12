@@ -13,7 +13,7 @@ class Gateway::Braintree < Gateway
     provider.authorize(money, payment_method, options)
   end
 
-  def capture(authorization, creditcard, ignored_options)
+  def capture(authorization, ignored_creditcard, ignored_options)
     amount = (authorization.amount * 100).to_i
     provider.capture(amount, authorization.response_code)
   end
